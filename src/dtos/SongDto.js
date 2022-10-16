@@ -20,20 +20,4 @@ const mapSongToModel = ({
     updatedAt: updated_at,
 });
 
-const mapSongToList = ({
-    id,
-    title,
-    year,
-    genre,
-    performer,
-    duration,
-    album_id,
-    created_at,
-    updated_at,
-}) => ({
-    id: id,
-    title: title,
-    performer: performer,
-})
-
-module.exports = { mapSongToModel, mapSongToList };
+module.exports = { mapSongToModel };

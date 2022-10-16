@@ -1,9 +1,7 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-const {mapAlbumsToModel} = require('../../dtos/AlbumDto');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const {mapSongToList} = require("../../dtos/SongDto");
 
 class AlbumsService {
     constructor() {
@@ -13,11 +11,10 @@ class AlbumsService {
     async addAlbum({ name, year }) {
         const id = nanoid(16);
         const createdAt = new Date().toISOString();
-        const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
-            values: [id, name, year, createdAt, updatedAt],
+            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $4) RETURNING id',
+            values: [id, name, year, createdAt],
         };
 
         const result = await this._pool.query(query);
@@ -30,29 +27,29 @@ class AlbumsService {
     }
 
     async getAlbums() {
-        const result = await this._pool.query('SELECT * FROM albums');
+        const result = await this._pool.query('SELECT id, name, year FROM albums');
         for (const res of result.rows) {
             const query = {
                 text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
                 values: [res.id],
             };
             const songs = await this._pool.query(query);
-            if (songs.rows.length) {
-                res.songs = songs.rows.map(mapSongToList);
+            if (songs.rowCount) {
+                res.songs = songs.rows;
             }
-        };
-        return result.rows.map(mapAlbumsToModel);
+        }
+        return result.rows;
     }
 
     async getAlbumById(id) {
         const query = {
-            text: 'SELECT * FROM albums WHERE id = $1',
+            text: 'SELECT id, name, year FROM albums WHERE id = $1',
             values: [id],
         };
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Album tidak ditemukan');
         }
 
@@ -62,11 +59,11 @@ class AlbumsService {
         };
         const songs = await this._pool.query(query2);
 
-        if (result.rows.length) {
-            result.rows[0].songs = songs.rows.map(mapSongToList);
+        if (result.rowCount) {
+            result.rows[0].songs = songs.rows;
         }
 
-        return result.rows.map(mapAlbumsToModel)[0];
+        return result.rows[0];
     }
 
     async editAlbumById(id, { name, year }) {
@@ -98,7 +95,3 @@ class AlbumsService {
 }
 
 module.exports = AlbumsService;
-
-
-
-

@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-const {mapSongToModel, mapSongToList} = require('../../dtos/SongDto');
+const {mapSongToModel} = require('../../dtos/SongDto');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
@@ -12,11 +12,10 @@ class SongsService {
     async addSong({ title, year, genre, performer, duration, albumId }) {
         const id = nanoid(16);
         const createdAt = new Date().toISOString();
-        const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
-            values: [id, title, year, genre, performer, duration, albumId, createdAt, updatedAt],
+            text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7, $8, $8) RETURNING id',
+            values: [id, title, year, genre, performer, duration, albumId, createdAt],
         };
 
         const result = await this._pool.query(query);
@@ -28,22 +27,13 @@ class SongsService {
         return result.rows[0].id;
     }
 
-    async getSongs( title, performer ) {
-        let text;
-        if (!title && !performer) {
-            text = 'SELECT * FROM songs';
-        } else if (!performer) {
-            text = `SELECT * FROM songs WHERE LOWER(title) LIKE '%${title.toLowerCase()}%'`;
-        } else if (!title) {
-            text = `SELECT * FROM songs WHERE LOWER(performer) LIKE '%${performer.toLowerCase()}%'`;
-        } else {
-            text = `SELECT * FROM songs WHERE LOWER(title) LIKE '%${title.toLowerCase()}%' AND LOWER(performer) LIKE '%${performer.toLowerCase()}%'`;
-        }
+    async getSongs( title = "", performer = "" ) {
         const query = {
-            text: text,
+            text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+            values: [`%${title}%`, `%${performer}%`],
         };
         const result = await this._pool.query(query);
-        return result.rows.map(mapSongToList);
+        return result.rows;
     }
 
     async getSongById(id) {
