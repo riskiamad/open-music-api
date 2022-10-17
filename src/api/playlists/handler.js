@@ -50,9 +50,10 @@ class PlaylistsHandler {
         const { songId } = request.payload;
         const { id: credentialId } = request.auth.credentials;
 
-        await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+        await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
         await this._songsService.getSongById(songId);
         await this._playlistsService.addSongToPlaylist(playlistId, songId);
+        await this._playlistsService.savePlaylistActivity(playlistId, songId, credentialId, "add");
 
         const response = h.response({
             status: 'success',
@@ -66,7 +67,7 @@ class PlaylistsHandler {
         const { id: playlistId } = request.params;
         const { id: credentialId } = request.auth.credentials;
 
-        await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+        await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
         const playlist = await this._playlistsService.getPlaylistById(playlistId);
 
         return {
@@ -83,12 +84,29 @@ class PlaylistsHandler {
         const { id: playlistId } = request.params;
         const { id: credentialId } = request.auth.credentials;
 
-        await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+        await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
         await this._playlistsService.removeSongFromPlaylist(playlistId, songId);
+        await this._playlistsService.savePlaylistActivity(playlistId, songId, credentialId, "delete");
 
         return {
             status: 'success',
             message: 'Lagu berhasil dihapus dari playlist',
+        };
+    }
+
+    async getPlaylistActivitiesHandler(request) {
+        const { id: credentialId } = request.auth.credentials;
+        const { id: playlistId } = request.params;
+
+        await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+        const activities = await this._playlistsService.getPlaylistActivities(playlistId);
+
+        return {
+            status:'success',
+            data: {
+                playlistId,
+                activities,
+            },
         };
     }
 }

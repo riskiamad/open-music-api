@@ -23,7 +23,10 @@ class AuthenticationsService {
 
         const result = await this._pool.query(query);
 
+        console.log(result.rows);
+
         if (!result.rowCount) {
+            console.log("gak ketemu");
             throw new InvariantError('Refresh token tidak valid');
         }
     }
