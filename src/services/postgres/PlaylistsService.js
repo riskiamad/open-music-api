@@ -36,8 +36,8 @@ class PlaylistsService {
             values: [owner],
         };
 
-        const result = await this._pool.query(query);
-        return result.rows;
+        const { rows } = await this._pool.query(query);
+        return rows;
     }
 
     async deletePlaylistById(id) {

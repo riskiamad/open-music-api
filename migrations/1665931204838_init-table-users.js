@@ -12,20 +12,22 @@ exports.up = (pgm) => {
             notNull: true,
         },
         password: {
-            type: 'TEXT',
+            type: 'VARCHAR(150)',
             notNull: true,
         },
         fullname: {
-            type: 'TEXT',
+            type: 'VARCHAR(150)',
             notNull: true,
         },
         created_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
         updated_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
     });
 };

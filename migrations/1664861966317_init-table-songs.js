@@ -7,7 +7,7 @@ exports.up = pgm => {
             primaryKey: true,
         },
         title: {
-            type: 'TEXT',
+            type: 'VARCHAR(150)',
             notNull: true,
         },
         year: {
@@ -15,11 +15,11 @@ exports.up = pgm => {
             notNull: true,
         },
         genre: {
-            type: 'TEXT',
+            type: 'VARCHAR(100)',
             notNull: true,
         },
         performer: {
-            type: 'TEXT',
+            type: 'VARCHAR(150)',
             notNull: true,
         },
         duration: {
@@ -34,12 +34,14 @@ exports.up = pgm => {
             onDelete: 'cascade',
         },
         created_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
         updated_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
     });
     pgm.createIndex('songs', ['title', 'performer', 'album_id']);

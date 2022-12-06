@@ -12,14 +12,12 @@ class PlaylistsHandler {
 
         const playlistId = await this._playlistsService.addPlaylist( name, credentialId );
 
-        const response = h.response({
+        return h.response({
             status: 'success',
             data: {
                 playlistId,
             },
-        });
-        response.code(201);
-        return response;
+        }).code(201);
     }
 
     async getAllOwnedPlaylistsHandler(request) {

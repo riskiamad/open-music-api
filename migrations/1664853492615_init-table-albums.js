@@ -7,7 +7,7 @@ exports.up = pgm => {
             primaryKey: true,
         },
         name: {
-            type: 'TEXT',
+            type: 'VARCHAR(150)',
             notNull: true,
         },
         year: {
@@ -15,12 +15,14 @@ exports.up = pgm => {
             notNull: true,
         },
         created_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('current_timestamp'),
         },
         updated_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('current_timestamp'),
         },
     })
 };
